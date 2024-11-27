@@ -1,3 +1,4 @@
+from color_set import RESET, YELLOW
 from engine_logic import (add_book, all_books, change_status, delete_book,
                           search, to_main_menu)
 
@@ -12,13 +13,13 @@ def main():
     пока пользователь не выберет опцию выхода.
     """
     while True:
-        print("\nДобро пожаловать в библиотеку!")
-        print("1. Добавить книгу")
-        print("2. Удалить книгу")
-        print("3. Искать книгу")
-        print("4. Показать все книги")
-        print("5. Изменить статус книги")
-        print("6. Выйти")
+        print(f"\n{YELLOW}Добро пожаловать в библиотеку!{RESET}")
+        print(f"{YELLOW}1. Добавить книгу{RESET}")
+        print(f"{YELLOW}2. Удалить книгу{RESET}")
+        print(f"{YELLOW}3. Искать книгу{RESET}")
+        print(f"{YELLOW}4. Показать все книги{RESET}")
+        print(f"{YELLOW}5. Изменить статус книги{RESET}")
+        print(f"{YELLOW}6. Выйти{RESET}")
         choice = input()
         if choice == "1":
             add_book()
@@ -36,7 +37,7 @@ def main():
             change_status()
             to_main_menu()
         if choice == "6":
-            print("До свидания!")
+            print(f"{YELLOW}До свидания!{RESET}")
             break
 
 
@@ -44,4 +45,6 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nПрограмма прервана пользователем. До свидания!")
+        print(
+            f"{YELLOW}\nПрограмма прервана пользователем. До свидания!{RESET}"
+        )

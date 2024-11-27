@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 from classes import Book
+from color_set import BLUE, GREEN, RED, RESET
 
 database = "book.json"
 
@@ -23,16 +24,18 @@ def json_to_data() -> list[Book]:
             data = json.load(file)
             return [Book.from_dict(book) for book in data]
     except FileNotFoundError as e:
-        print(f"Ошибка: Файл '{database}' не найден. {e}")
+        print(
+            f"{RED}Ошибка: Файл {RESET}'{database}' {RED}не найден. {RESET}{e}"
+        )
         to_main_menu()
     except json.JSONDecodeError as e:
-        print(f"Ошибка: Невозможно разобрать файл JSON. {e}")
+        print(f"{RED}Ошибка: Невозможно разобрать файл JSON. {RESET}{e}")
         to_main_menu()
     except TypeError as e:
-        print(f"Ошибка: Некорректные данные в JSON. {e}")
+        print(f"{RED}Ошибка: Некорректные данные в JSON. {RESET}{e}")
         to_main_menu()
     except Exception as e:
-        print(f"Неизвестная ошибка: {e}")
+        print(f"{RED}Неизвестная ошибка: {RESET}{e}")
         to_main_menu()
 
 
@@ -53,22 +56,27 @@ def data_to_json(books: list[Book]) -> None:
                 ensure_ascii=False
             )
     except FileNotFoundError:
-        print(f"Ошибка: Директория для файла {database} не найдена.")
+        print(
+            f"{RED}Ошибка: Директория для файла {RESET}"
+            f"{database} {RED}не найдена.{RESET}"
+        )
         to_main_menu()
     except PermissionError:
-        print(f"Ошибка: У вас нет прав на запись в файл {database}.")
+        print(
+            f"{RED}Ошибка: У вас нет прав на запись в файл {RESET}{database}."
+        )
         to_main_menu()
     except TypeError as e:
-        print(f"Ошибка при сериализации данных: {e}")
+        print(f"{RED}Ошибка при сериализации данных: {RESET}{e}")
         to_main_menu()
     except IOError as e:
-        print(f"Ошибка ввода-вывода: {e}")
+        print(f"{RED}Ошибка ввода-вывода: {RESET}{e}")
         to_main_menu()
     except OSError as e:
-        print(f"Ошибка операционной системы: {e}")
+        print(f"{RED}Ошибка операционной системы: {RESET}{e}")
         to_main_menu()
     except Exception as e:
-        print(f"Произошла непредвиденная ошибка: {e}")
+        print(f"{RED}Произошла непредвиденная ошибка: {RESET}{e}")
         to_main_menu()
 
 
@@ -85,29 +93,40 @@ def id_generator() -> str:
             return int(books[-1].id) + 1
         return 1
     except FileNotFoundError:
-        print("Файл базы данных не найден.")
+        print(f"{RED}Файл базы данных не найден.{RESET}")
         to_main_menu()
     except json.JSONDecodeError:
-        print("Ошибка в формате JSON файла. Проверьте целостность базы.")
+        print(
+            f"{RED}Ошибка в формате JSON файла. {RESET}"
+            f"{RED}Проверьте целостность базы.{RESET}"
+        )
         to_main_menu()
     except (ValueError, IndexError):
-        print("Ошибка при генерации ID. Проверьте целостность данных.")
+        print(
+            f"О{RED}шибка при генерации ID. {RESET}"
+            f"{RED}Проверьте целостность данных.{RESET}"
+        )
         to_main_menu()
 
 
 def to_main_menu():
     """Возврат в главное меню."""
-    print("\nЖелаете продолджить? ")
-    print("1. В главное меню")
-    print("2. выход")
+    print(f"\n{'-'*40}")
+    print(f"\n{BLUE}Желаете продолджить? {RESET}")
+    print(f"{BLUE}1. В главное меню{RESET}")
+    print(f"{BLUE}2. выход{RESET}")
     while True:
-        choice = input("Введите ваш выбор: ")
+        choice = input(f"{BLUE}Введите ваш выбор: {RESET}")
+        print(f"\n{'-'*40}")
         if choice == "1":
             return
         if choice == "2":
-            print("До свидания")
+            print(f"{GREEN}До свидания{BLUE}")
             exit()
-        print("Неверный ввод, выберите один из предложенных вариантов.")
+        print(
+            f"{RED}Неверный ввод, {RESET}"
+            f"{RED}выберите один из предложенных вариантов.{RESET}"
+        )
 
 
 def add_book() -> None:
@@ -116,37 +135,49 @@ def add_book() -> None:
 
     Сохраняет изменения в JSON файл.
     """
-    books = json_to_data()
+    try:
+        books = json_to_data()
+    except Exception as e:
+        print(f"{RED}Ошибка при загрузке базы данных: {RESET}{e}")
+        to_main_menu()
+        return
     book_id = id_generator()
     while True:
-        title = input("Введите название книги:")
+        title = input(f"{BLUE}Введите название книги:{RESET}")
         if 2 <= len(title) <= 250:
             break
         print(
-            'Название книги должно быть от 2 до 250 символов.'
-            'Попробуйте снова.'
+            f"{RED}Название книги должно быть от 2 до 250 символов.{RESET}"
+            f"{RED}Попробуйте снова.{RESET}"
         )
     while True:
-        author = input("Введите имя автора:")
+        author = input(f"{BLUE}Введите имя автора:{RESET}")
         if len(author) <= 250:
             break
-        print('Имя не может превышать 250 символов. Попробуйте снова.')
+        print(
+            f"{RED}Имя не может превышать 250 символов. {RESET}"
+            f"{RED}Попробуйте снова.{RESET}"
+        )
     while True:
-        year = input("Введите год издания:")
+        year = input(f"{BLUE}Введите год издания:{RESET}")
         try:
             if 1000 <= int(year) <= datetime.now().year:
                 break
             print(
-                'Год не может быть больше текущего или меньше 1000.'
-                'Попробуйте снова:'
+                f"{RED}Год не может быть больше {RESET}"
+                f"{RED}текущего или меньше 1000.{RESET}"
+                f"{RED}Попробуйте снова:{RESET}"
             )
         except ValueError:
-            print('Введите корректное число.')
+            print(f"{RED}Введите корректное число.{RESET}")
     status = "В наличии"
     new_book = Book(book_id, title, author, year, status)
     books.append(new_book)
     data_to_json(books)
-    print(f"Книга '{new_book.title}' добавлена с ID {new_book.id}!")
+    print(
+        f"{GREEN}Книга {RESET}'{new_book.title}'"
+        f"{GREEN} добавлена с ID {new_book.id}!{RESET}"
+    )
 
 
 def delete_book() -> None:
@@ -155,24 +186,33 @@ def delete_book() -> None:
 
     Сохраняет изменения в JSON файл.
     """
-    books = json_to_data()
-    if not books:
-        print("База данных пуста. Удаление невозможно.")
+    try:
+        books = json_to_data()
+    except Exception as e:
+        print(f"{RED}Ошибка при загрузке базы данных: {RESET}{e}")
+        to_main_menu()
         return
-    delete_id = input("Введите ID книги для удаления: ")
+    if not books:
+        print(f"{RED}База данных пуста. Удаление невозможно.{RESET}")
+        return
+    delete_id = input(f"{BLUE}Введите ID книги для удаления: {RESET}")
     initial_count = len(books)
     books = [book for book in books if book.id != int(delete_id)]
     confirm = input(
-        f"Вы уверены, что хотите удалить книгу с ID {delete_id}? (y/n): "
+        f"{BLUE}Вы уверены, что хотите удалить книгу с ID {RESET}"
+        f"{RED}{delete_id}? {RED}(y/n):{RESET} "
     )
     if confirm.lower() != 'y':
-        print("Удаление отменено.")
+        print(f"{GREEN}Удаление отменено.{RESET}")
         return
     if len(books) < initial_count:
         data_to_json(books)
-        print(f"Книга с ID {delete_id} успешно удалена.")
+        print(
+            f"{GREEN}Книга с ID {RESET}{delete_id}"
+            f"{GREEN} успешно удалена.{RESET}"
+        )
     else:
-        print(f"Книга с ID {delete_id} не найдена.")
+        print(f"{RED}Книга с ID {RESET}{delete_id}{RED} не найдена.{RESET}")
 
 
 def search() -> None:
@@ -186,34 +226,37 @@ def search() -> None:
     try:
         books = json_to_data()
     except Exception as e:
-        print(f"Ошибка при загрузке базы данных: {e}")
+        print(f"{RED}Ошибка при загрузке базы данных: {RESET}{e}")
         to_main_menu()
         return
     if not books:
-        print("База данных пуста. Поиск невозможен.")
+        print(f"{RED}База данных пуста. Поиск невозможен.{RESET}")
         return
-    print("По какому параметру будем осуществлять поиск?")
-    print("1. По названию")
-    print("2. По автору")
-    print("3. По году")
+    print(f"{BLUE}По какому параметру будем осуществлять поиск?{RESET}")
+    print(f"{BLUE}1. По названию{RESET}")
+    print(f"{BLUE}2. По автору{RESET}")
+    print(f"{BLUE}3. По году{RESET}")
     while True:
-        search_parameter: str = input("Введите номер параметра поиска: ")
+        search_parameter: str = input(
+            f"{BLUE}Введите номер параметра поиска: {RESET}"
+        )
         if search_parameter in {"1", "2", "3"}:
             break
-        print("Некорректный выбор параметра. Попробуйте снова.")
+        print(f"{RED}Некорректный выбор параметра. Попробуйте снова.{RESET}")
     while True:
-        search_value: str = input("Введите занчение поиска: ")
+        search_value: str = input(f"{BLUE}Введите занчение поиска: {RESET}")
         if search_parameter in {"1", "2"} and search_value:
             break
         try:
             if 1000 <= int(search_value) <= datetime.now().year:
                 break
             print(
-                'Год не может быть больше текущего или меньше 1000. '
-                'Попробуйте снова:'
+                f"{RED}Год не может быть больше {RESET}"
+                f"{RED}текущего или меньше 1000. {RESET}"
+                f"{RED}Попробуйте снова:{RESET}"
             )
         except ValueError:
-            print("Введите корректный год (от 1000 до текущего).")
+            print(f"{RED}Введите корректный год (от 1000 до текущего).{RESET}")
     if search_parameter == "1":
         filtred_books = [
             book for book in books
@@ -230,15 +273,15 @@ def search() -> None:
             if book.year == search_value
         ]
     if filtred_books:
-        print("Результаты поиска: ")
+        print(f"\n{'-'*40}")
+        print(f"{BLUE}Результаты поиска: {RESET}")
         for book in filtred_books:
-            print(
-                f"\nId: {book.id}"
-                f"\nНазвание: {book.title}"
-                f"\nАвтор: {book.author}"
-                f"\nГод издания: {book.year}"
-                f"\nНаличие: {book.status}"
-            )
+            print(f"{GREEN}ID: {book.id}{RESET}")
+            print(f"{BLUE}Название:{RESET} {book.title}")
+            print(f"{BLUE}Автор:{RESET} {book.author}")
+            print(f"{BLUE}Год издания:{RESET} {book.year}")
+            print(f"{BLUE}Наличие:{RESET} {book.status}")
+            print(f"{'-'*40}\n")
     else:
         print("Совпадений не найдено.")
 
@@ -252,13 +295,13 @@ def all_books() -> None:
         to_main_menu()
         return
     for book in books:
-        print(
-            f"\nId: {book.id}"
-            f"\nНазвание: {book.title}"
-            f"\nАвтор: {book.author}"
-            f"\nГод издания: {book.year}"
-            f"\nНаличие: {book.status}"
-        )
+        print(f"\n{'-'*40}")
+        print(f"{GREEN}ID: {book.id}{RESET}")
+        print(f"{BLUE}Название:{RESET} {book.title}")
+        print(f"{BLUE}Автор:{RESET} {book.author}")
+        print(f"{BLUE}Год издания:{RESET} {book.year}")
+        print(f"{BLUE}Наличие:{RESET} {book.status}")
+        print(f"{'-'*40}\n")
 
 
 def change_status() -> None:
@@ -271,29 +314,39 @@ def change_status() -> None:
     try:
         books = json_to_data()
     except Exception as e:
-        print(f"Ошибка при загрузке базы данных: {e}")
+        print(f"{RED}Ошибка при загрузке базы данных: {RESET}{e}")
         to_main_menu()
         return
     while True:
-        change_id = input("Введите ID книги:")
+        change_id = input(f"{BLUE}Введите ID книги:{RESET}")
         try:
             if 1 <= int(change_id):
                 break
             print(
-                'Id не может быть больше меньше 1.'
-                'Попробуйте снова:'
+                f"{RED}Id не может быть больше меньше 1.{RESET}"
+                f"{RED}Попробуйте снова:{RESET}"
             )
         except ValueError:
-            print('Введите корректное число.')
+            print(f'{RED}Введите корректное число.{RESET}')
     try:
         book = next(book for book in books if book.id == int(change_id))
     except StopIteration:
-        print(f"Книга с ID {change_id} не найдена.")
+        print(f"\n{'-'*40}")
+        print(f"{RED}Книга с ID {RESET}{change_id} {RED}не найдена.{RESET}")
+        print(f"\n{'-'*40}")
         return
     if book.status == "В наличии":
         book.status = "Выдана"
-        print(f"Статус книги с ID {change_id} изменен на '{book.status}'.")
+        print(f"\n{'-'*40}")
+        print(
+            f"{GREEN}Статус книги с ID{RESET} {change_id} "
+            f"{GREEN}изменен на {RESET}'{book.status}'.")
+        print(f"\n{'-'*40}")
     else:
         book.status = "В наличии"
-        print(f"Статус книги с ID {change_id} изменен на '{book.status}'.")
+        print(f"\n{'-'*40}")
+        print(
+            f"{GREEN}Статус книги с ID{RESET} {change_id} "
+            f"{GREEN}изменен на {RESET}'{book.status}'.")
+        print(f"\n{'-'*40}")
     data_to_json(books)
