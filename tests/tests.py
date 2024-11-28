@@ -33,7 +33,7 @@ class TestEngineLogic(unittest.TestCase):
         if os.path.exists(self.test_file):
             os.remove(self.test_file)
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     def test_a_json_to_data(self):
         """Тест загрузки данных из JSON в список объектов Book."""
         books = json_to_data()
@@ -41,7 +41,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(books[0].title, "Книга 1")
         self.assertEqual(books[1].status, "Выдана")
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     def test_b_data_to_json(self):
         """Тест сохранения списка объектов Book в JSON файл."""
         new_books = [
@@ -55,7 +55,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(data[0]["title"], "Книга 3")
         self.assertEqual(data[1]["status"], "Выдана")
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     @patch("builtins.input", side_effect=["Книга 3", "Автор 3", "2020"])
     def test_c_add_book(self, mock_input):
         """Тест добавления книги в базу данных."""
@@ -65,7 +65,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(books[-1].title, "Книга 3")
 
     @patch("builtins.input", side_effect=["1", "y"])
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     def test_d_delete_book(self, mock_input):
         """Тест удаления книги по ID."""
         delete_book()
@@ -73,7 +73,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(len(books), 1)
         self.assertNotEqual(books[0].id, "1")
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     @patch("builtins.input", side_effect=["1"])
     def test_e_change_status(self, mock_input):
         """Тест изменения статуса книги."""
@@ -81,7 +81,7 @@ class TestEngineLogic(unittest.TestCase):
         books = json_to_data()
         self.assertEqual(books[0].status, "Выдана")
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     @patch("builtins.input", side_effect=["1", "Книга 1"])
     def test_f_search_by_title(self, mock_input):
         """Тест поиска книги по названию."""
@@ -90,7 +90,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(len(books), 2)
         self.assertEqual(books[0].title, "Книга 1")
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     @patch("builtins.input", side_effect=["2", "Автор 2"])
     def test_g_search_by_author(self, mock_input):
         """Тест поиска книги по автору."""
@@ -99,7 +99,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(len(books), 2)
         self.assertEqual(books[1].author, "Автор 2")
 
-    @patch("engine_logic.database", "test_book.json")
+    @patch("engine_logic.DATABASE", "test_book.json")
     @patch("builtins.input", side_effect=["3", "2010"])
     def test_h_search_by_year(self, mock_input):
         """Тест поиска книги по году издания."""

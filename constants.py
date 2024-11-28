@@ -1,0 +1,10 @@
+RED = "\033[31m"
+GREEN = "\033[32m"
+BLUE = "\033[1;34m"
+YELLOW = "\033[33m"
+SEPARATOR = "-" * 40
+RESET = "\033[0m"
+DATABASE = "book.json"
+STATUS_AVAILABLE = "В наличии"
+STATUS_ISSUED = "Выдана"
+MIN_YEAR = 1000

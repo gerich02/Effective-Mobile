@@ -3,9 +3,8 @@ import os
 from datetime import datetime
 
 from classes import Book
-from color_set import BLUE, GREEN, RED, RESET
-
-database = "book.json"
+from constants import (BLUE, DATABASE, GREEN, MIN_YEAR, RED, RESET, SEPARATOR,
+                       STATUS_AVAILABLE, STATUS_ISSUED)
 
 
 def json_to_data() -> list[Book]:
@@ -17,15 +16,15 @@ def json_to_data() -> list[Book]:
         list: Список объектов класса Book.
     """
     try:
-        if not os.path.exists(database):
-            with open(database, "w", encoding="utf-8") as file:
+        if not os.path.exists(DATABASE):
+            with open(DATABASE, "w", encoding="utf-8") as file:
                 json.dump([], file, indent=4)
-        with open(database, "r", encoding="utf-8") as file:
+        with open(DATABASE, "r", encoding="utf-8") as file:
             data = json.load(file)
             return [Book.from_dict(book) for book in data]
     except FileNotFoundError as e:
         print(
-            f"{RED}Ошибка: Файл {RESET}'{database}' {RED}не найден. {RESET}{e}"
+            f"{RED}Ошибка: Файл {RESET}'{DATABASE}' {RED}не найден. {RESET}{e}"
         )
         to_main_menu()
     except json.JSONDecodeError as e:
@@ -47,7 +46,7 @@ def data_to_json(books: list[Book]) -> None:
         books (list): Список объектов класса Book.
     """
     try:
-        with open(database, "w", encoding="utf-8") as file:
+        with open(DATABASE, "w", encoding="utf-8") as file:
             json.dump(
                 [
                     book.to_dict() for book in books
@@ -58,12 +57,12 @@ def data_to_json(books: list[Book]) -> None:
     except FileNotFoundError:
         print(
             f"{RED}Ошибка: Директория для файла {RESET}"
-            f"{database} {RED}не найдена.{RESET}"
+            f"{DATABASE} {RED}не найдена.{RESET}"
         )
         to_main_menu()
     except PermissionError:
         print(
-            f"{RED}Ошибка: У вас нет прав на запись в файл {RESET}{database}."
+            f"{RED}Ошибка: У вас нет прав на запись в файл {RESET}{DATABASE}."
         )
         to_main_menu()
     except TypeError as e:
@@ -111,13 +110,13 @@ def id_generator() -> str:
 
 def to_main_menu():
     """Возврат в главное меню."""
-    print(f"\n{'-'*40}")
+    print(f"\n{SEPARATOR}")
     print(f"\n{BLUE}Желаете продолджить? {RESET}")
     print(f"{BLUE}1. В главное меню{RESET}")
     print(f"{BLUE}2. выход{RESET}")
     while True:
         choice = input(f"{BLUE}Введите ваш выбор: {RESET}")
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
         if choice == "1":
             return
         if choice == "2":
@@ -161,16 +160,16 @@ def add_book() -> None:
     while True:
         year = input(f"{BLUE}Введите год издания:{RESET}")
         try:
-            if 1000 <= int(year) <= datetime.now().year:
+            if MIN_YEAR <= int(year) <= datetime.now().year:
                 break
             print(
                 f"{RED}Год не может быть больше {RESET}"
-                f"{RED}текущего или меньше 1000.{RESET}"
+                f"{RED}текущего или меньше {MIN_YEAR}.{RESET}"
                 f"{RED}Попробуйте снова:{RESET}"
             )
         except ValueError:
             print(f"{RED}Введите корректное число.{RESET}")
-    status = "В наличии"
+    status = STATUS_AVAILABLE
     new_book = Book(book_id, title, author, year, status)
     books.append(new_book)
     data_to_json(books)
@@ -248,15 +247,18 @@ def search() -> None:
         if search_parameter in {"1", "2"} and search_value:
             break
         try:
-            if 1000 <= int(search_value) <= datetime.now().year:
+            if MIN_YEAR <= int(search_value) <= datetime.now().year:
                 break
             print(
                 f"{RED}Год не может быть больше {RESET}"
-                f"{RED}текущего или меньше 1000. {RESET}"
+                f"{RED}текущего или меньше {MIN_YEAR}. {RESET}"
                 f"{RED}Попробуйте снова:{RESET}"
             )
         except ValueError:
-            print(f"{RED}Введите корректный год (от 1000 до текущего).{RESET}")
+            print(
+                f"{RED}Введите корректный год:"
+                f"(от {MIN_YEAR} до текущего).{RESET}"
+            )
     if search_parameter == "1":
         filtred_books = [
             book for book in books
@@ -273,7 +275,7 @@ def search() -> None:
             if book.year == search_value
         ]
     if filtred_books:
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
         print(f"{BLUE}Результаты поиска: {RESET}")
         for book in filtred_books:
             print(f"{GREEN}ID: {book.id}{RESET}")
@@ -281,7 +283,7 @@ def search() -> None:
             print(f"{BLUE}Автор:{RESET} {book.author}")
             print(f"{BLUE}Год издания:{RESET} {book.year}")
             print(f"{BLUE}Наличие:{RESET} {book.status}")
-            print(f"{'-'*40}\n")
+            print(f"{SEPARATOR}")
     else:
         print("Совпадений не найдено.")
 
@@ -295,13 +297,13 @@ def all_books() -> None:
         to_main_menu()
         return
     for book in books:
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
         print(f"{GREEN}ID: {book.id}{RESET}")
         print(f"{BLUE}Название:{RESET} {book.title}")
         print(f"{BLUE}Автор:{RESET} {book.author}")
         print(f"{BLUE}Год издания:{RESET} {book.year}")
         print(f"{BLUE}Наличие:{RESET} {book.status}")
-        print(f"{'-'*40}\n")
+        print(f"{SEPARATOR}\n")
 
 
 def change_status() -> None:
@@ -331,22 +333,22 @@ def change_status() -> None:
     try:
         book = next(book for book in books if book.id == int(change_id))
     except StopIteration:
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
         print(f"{RED}Книга с ID {RESET}{change_id} {RED}не найдена.{RESET}")
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
         return
-    if book.status == "В наличии":
-        book.status = "Выдана"
-        print(f"\n{'-'*40}")
+    if book.status == STATUS_AVAILABLE:
+        book.status = STATUS_ISSUED
+        print(f"\n{SEPARATOR}")
         print(
             f"{GREEN}Статус книги с ID{RESET} {change_id} "
             f"{GREEN}изменен на {RESET}'{book.status}'.")
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
     else:
-        book.status = "В наличии"
-        print(f"\n{'-'*40}")
+        book.status = STATUS_AVAILABLE
+        print(f"\n{SEPARATOR}")
         print(
             f"{GREEN}Статус книги с ID{RESET} {change_id} "
             f"{GREEN}изменен на {RESET}'{book.status}'.")
-        print(f"\n{'-'*40}")
+        print(f"\n{SEPARATOR}")
     data_to_json(books)
