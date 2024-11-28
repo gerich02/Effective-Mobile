@@ -108,24 +108,36 @@ def id_generator() -> str:
         to_main_menu()
 
 
-def to_main_menu():
-    """Возврат в главное меню."""
-    print(f"\n{SEPARATOR}")
-    print(f"\n{BLUE}Желаете продолджить? {RESET}")
-    print(f"{BLUE}1. В главное меню{RESET}")
-    print(f"{BLUE}2. выход{RESET}")
+def to_main_menu(func=None):
+    """Меню выбора действий.
+
+    Предлагает пользователю вернуться в главное меню, выйти из программы
+    или повторить последнее действие (если оно указано).
+    Args:
+        func (Optional[Callable]):
+        Последняя выполненная функция, которая может быть повторена.
+    """
     while True:
+        print(f"\n{SEPARATOR}")
+        print(f"\n{BLUE}Желаете продолжить? {RESET}")
+        print(f"{BLUE}1. В главное меню{RESET}")
+        print(f"{BLUE}2. Выход{RESET}")
+        if func:
+            print(f"{BLUE}3. Повторить последнее действие{RESET}")
         choice = input(f"{BLUE}Введите ваш выбор: {RESET}")
         print(f"\n{SEPARATOR}")
         if choice == "1":
             return
         if choice == "2":
-            print(f"{GREEN}До свидания{BLUE}")
+            print(f"{GREEN}До свидания{RESET}")
             exit()
-        print(
-            f"{RED}Неверный ввод, {RESET}"
-            f"{RED}выберите один из предложенных вариантов.{RESET}"
-        )
+        if func and choice == "3":
+            func()
+        else:
+            print(
+                f"{RED}Неверный ввод. {RESET}"
+                f"{RED}Выберите один из предложенных вариантов.{RESET}"
+            )
 
 
 def add_book() -> None:
@@ -197,6 +209,9 @@ def delete_book() -> None:
     delete_id = input(f"{BLUE}Введите ID книги для удаления: {RESET}")
     initial_count = len(books)
     books = [book for book in books if book.id != int(delete_id)]
+    if len(books) == initial_count:
+        print(f"{RED}Книга с ID {RESET}{delete_id}{RED} не найдена.{RESET}")
+        return
     confirm = input(
         f"{BLUE}Вы уверены, что хотите удалить книгу с ID {RESET}"
         f"{RED}{delete_id}? {RED}(y/n):{RESET} "
@@ -204,14 +219,11 @@ def delete_book() -> None:
     if confirm.lower() != 'y':
         print(f"{GREEN}Удаление отменено.{RESET}")
         return
-    if len(books) < initial_count:
-        data_to_json(books)
-        print(
-            f"{GREEN}Книга с ID {RESET}{delete_id}"
-            f"{GREEN} успешно удалена.{RESET}"
-        )
-    else:
-        print(f"{RED}Книга с ID {RESET}{delete_id}{RED} не найдена.{RESET}")
+    data_to_json(books)
+    print(
+        f"{GREEN}Книга с ID {RESET}{delete_id}"
+        f"{GREEN} успешно удалена.{RESET}"
+    )
 
 
 def search() -> None:
